@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { NotificationsService } from './notifications.service';
-import { ReviewCreatedEvent, ReplyAddedEvent, ReviewLikedEvent, ReviewDeletedEvent } from './events/notification.events';
+import {
+  ReviewCreatedEvent,
+  ReplyAddedEvent,
+  ReviewLikedEvent,
+  ReviewDeletedEvent,
+} from './events/notification.events';
 import { EventsGateway } from '../sockets/events.gateway';
 
 @Injectable()
@@ -13,8 +18,10 @@ export class NotificationsListener {
 
   @OnEvent('review.created')
   async handleReviewCreated(event: ReviewCreatedEvent) {
-    console.log(`[NotificationListener] New review by ${event.userName} on product ${event.productName}`);
-    
+    console.log(
+      `[NotificationListener] New review by ${event.userName} on product ${event.productName}`,
+    );
+
     // Persist as a GLOBAL notification (recipientId: null)
     const notification = await this.notificationsService.create({
       recipientId: null,
@@ -36,15 +43,21 @@ export class NotificationsListener {
       link: `/product/${event.productSlug}#reviews`,
       notification, // Pass the fully populated notification
     });
-    
+
     // UI update trigger
-    this.eventsGateway.broadcastToProduct(event.productId.toString(), 'review:updated', {});
+    this.eventsGateway.broadcastToProduct(
+      event.productId.toString(),
+      'review:updated',
+      {},
+    );
   }
 
   @OnEvent('reply.added')
   async handleReplyAdded(event: ReplyAddedEvent) {
-    console.log(`[NotificationListener] New reply by ${event.userName} on product ${event.productSlug}`);
-    
+    console.log(
+      `[NotificationListener] New reply by ${event.userName} on product ${event.productSlug}`,
+    );
+
     if (event.userId.toString() === event.reviewOwnerId.toString()) return;
 
     const notification = await this.notificationsService.create({
@@ -57,13 +70,23 @@ export class NotificationsListener {
       link: `/product/${event.productSlug}#reviews`,
     });
 
-    this.eventsGateway.sendToUser(event.reviewOwnerId.toString(), 'notification:new', notification);
-    this.eventsGateway.broadcastToProduct(event.productId.toString(), 'review:updated', {});
+    this.eventsGateway.sendToUser(
+      event.reviewOwnerId.toString(),
+      'notification:new',
+      notification,
+    );
+    this.eventsGateway.broadcastToProduct(
+      event.productId.toString(),
+      'review:updated',
+      {},
+    );
   }
 
   @OnEvent('review.liked')
   async handleReviewLiked(event: ReviewLikedEvent) {
-    console.log(`[NotificationListener] User ${event.actorName} liked review ${event.reviewId}`);
+    console.log(
+      `[NotificationListener] User ${event.actorName} liked review ${event.reviewId}`,
+    );
 
     if (event.actorId.toString() === event.reviewOwnerId.toString()) return;
 
@@ -74,17 +97,29 @@ export class NotificationsListener {
       title: 'Review Liked',
       message: `${event.actorName} liked your review.`,
       relatedId: event.reviewId as any,
-      link: event.productSlug ? `/product/${event.productSlug}#reviews` : undefined,
+      link: event.productSlug
+        ? `/product/${event.productSlug}#reviews`
+        : undefined,
     });
 
-    this.eventsGateway.sendToUser(event.reviewOwnerId.toString(), 'notification:new', notification);
-    this.eventsGateway.broadcastToProduct(event.productId.toString(), 'review:updated', {});
+    this.eventsGateway.sendToUser(
+      event.reviewOwnerId.toString(),
+      'notification:new',
+      notification,
+    );
+    this.eventsGateway.broadcastToProduct(
+      event.productId.toString(),
+      'review:updated',
+      {},
+    );
   }
 
   @OnEvent('review.deleted')
   async handleReviewDeleted(event: ReviewDeletedEvent) {
-    console.log(`[NotificationListener] Admin ${event.adminName} deleted review ${event.productId}`);
-    
+    console.log(
+      `[NotificationListener] Admin ${event.adminName} deleted review ${event.productId}`,
+    );
+
     const notification = await this.notificationsService.create({
       recipientId: event.reviewOwnerId as any,
       actorId: null as any,
@@ -95,7 +130,15 @@ export class NotificationsListener {
       link: `/product/${event.productSlug}#reviews`,
     });
 
-    this.eventsGateway.sendToUser(event.reviewOwnerId.toString(), 'notification:new', notification);
-    this.eventsGateway.broadcastToProduct(event.productId.toString(), 'review:updated', {});
+    this.eventsGateway.sendToUser(
+      event.reviewOwnerId.toString(),
+      'notification:new',
+      notification,
+    );
+    this.eventsGateway.broadcastToProduct(
+      event.productId.toString(),
+      'review:updated',
+      {},
+    );
   }
 }

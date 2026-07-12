@@ -22,7 +22,7 @@ export class RepliesService {
   async create(createReplyDto: CreateReplyDto, user: User): Promise<Reply> {
     // Ensure the review exists
     const review = await this.reviewsService.findById(createReplyDto.reviewId);
-    
+
     // Fetch product to get slug for linking
     const product = await this.productModel.findById(review.productId);
 
@@ -32,18 +32,18 @@ export class RepliesService {
       comment: createReplyDto.comment,
     });
     const saved = await newReply.save();
-    
+
     // Emit event with product slug for linking (e.g., /product/slug#reviews)
     this.eventEmitter.emit(
       'reply.added',
       new ReplyAddedEvent(
-        saved._id as Types.ObjectId,
-        review._id as Types.ObjectId,
+        saved._id,
+        review._id,
         product?._id as Types.ObjectId,
         product?.slug || '',
-        user._id as Types.ObjectId,
+        user._id,
         user.name,
-        review.userId as Types.ObjectId,
+        review.userId,
       ),
     );
 

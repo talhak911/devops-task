@@ -15,20 +15,22 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   // Set global validation pipe
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Enable CORS
   app.enableCors({
     origin: (origin, callback) => {
       const originsConfig = configService.get<string>('CORS_ORIGINS');
       const allowedOrigins = originsConfig
-        ? originsConfig.split(',').map(o => o.trim().replace(/\/$/, ''))
+        ? originsConfig.split(',').map((o) => o.trim().replace(/\/$/, ''))
         : ['http://localhost:5173', 'http://localhost:3000'];
-      
+
       if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ''))) {
         callback(null, true);
       } else {
@@ -40,6 +42,8 @@ async function bootstrap() {
 
   const port = configService.get<number>('PORT') || 5006;
   await app.listen(port);
-  console.log(`Real-Time Service is running on: http://localhost:${port}/api/v1`);
+  console.log(
+    `Real-Time Service is running on: http://localhost:${port}/api/v1`,
+  );
 }
 bootstrap();

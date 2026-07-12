@@ -20,7 +20,9 @@ import { SocketsModule } from './sockets/sockets.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI') || configService.get<string>('MONGO_URI'),
+        uri:
+          configService.get<string>('MONGODB_URI') ||
+          configService.get<string>('MONGO_URI'),
       }),
       inject: [ConfigService],
     }),

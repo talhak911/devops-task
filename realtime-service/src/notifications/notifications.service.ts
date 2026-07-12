@@ -26,9 +26,18 @@ export class NotificationsService {
     return notification.save();
   }
 
-  async findByUser(userId: string | null, page: number = 1, limit: number = 10): Promise<Notification[]> {
-    const query = userId 
-      ? { $or: [{ recipientId: new Types.ObjectId(userId) }, { recipientId: null }] }
+  async findByUser(
+    userId: string | null,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<Notification[]> {
+    const query = userId
+      ? {
+          $or: [
+            { recipientId: new Types.ObjectId(userId) },
+            { recipientId: null },
+          ],
+        }
       : { recipientId: null };
 
     return this.notificationModel

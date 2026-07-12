@@ -1,4 +1,12 @@
-import { Controller, Get, Patch, Param, UseGuards, Post, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Param,
+  UseGuards,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { OptionalAuthGuard } from '../common/guards/optional-auth.guard';
@@ -17,13 +25,19 @@ export class NotificationsController {
     @Query('limit') limit: string = '10',
   ) {
     const userId = user ? user._id.toString() : null;
-    return this.notificationsService.findByUser(userId, parseInt(page), parseInt(limit));
+    return this.notificationsService.findByUser(
+      userId,
+      parseInt(page),
+      parseInt(limit),
+    );
   }
 
   @Get('unread-count')
   @UseGuards(AuthGuard)
   async getUnreadCount(@CurrentUser() user: User) {
-    const count = await this.notificationsService.getUnreadCount(user._id.toString());
+    const count = await this.notificationsService.getUnreadCount(
+      user._id.toString(),
+    );
     return { count };
   }
 

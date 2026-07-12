@@ -3,7 +3,13 @@ import { Document, Types } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Notification extends Document {
-  @Prop({ type: Types.ObjectId, ref: 'User', required: false, index: true, default: null })
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'User',
+    required: false,
+    index: true,
+    default: null,
+  })
   recipientId: Types.ObjectId | null;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })

@@ -11,13 +11,16 @@ import * as jwt from 'jsonwebtoken';
 
 @WebSocketGateway({
   cors: {
-    origin: (origin: string, callback: (err: Error | null, allow?: boolean) => void) => {
+    origin: (
+      origin: string,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
       // In development or if CORS_ORIGINS is not set, allow all
       const corsOrigins = process.env.CORS_ORIGINS;
       if (!corsOrigins || corsOrigins === '*') {
         return callback(null, true);
       }
-      
+
       const allowedOrigins = corsOrigins.split(',');
       if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
         callback(null, true);
@@ -36,8 +39,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection(client: Socket) {
     try {
-      const token = client.handshake.auth.token || client.handshake.headers.authorization?.split(' ')[1];
-      
+      const token =
+        client.handshake.auth.token ||
+        client.handshake.headers.authorization?.split(' ')[1];
+
       if (token) {
         const secret = this.configService.get<string>('JWT_SECRET');
         if (!secret) {
@@ -48,12 +53,16 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         // Join user to their personal room
         client.join(`user:${userId}`);
-        console.log(`[EventsGateway] Client ${client.id} authenticated as user ${userId}`);
+        console.log(
+          `[EventsGateway] Client ${client.id} authenticated as user ${userId}`,
+        );
       } else {
         console.log(`[EventsGateway] Client ${client.id} connected as Guest`);
       }
     } catch (err) {
-      console.log(`[EventsGateway] Client ${client.id} connection error: ${err.message}`);
+      console.log(
+        `[EventsGateway] Client ${client.id} connection error: ${err.message}`,
+      );
       // Don't necessarily disconnect, just treat as guest or log error
     }
   }

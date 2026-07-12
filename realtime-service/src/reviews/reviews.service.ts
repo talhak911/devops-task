@@ -1,11 +1,19 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Review } from './schemas/review.schema';
 import { CreateReviewDto } from './dto/review.dto';
 import { User } from '../common/schemas/user.schema';
-import { ReviewCreatedEvent, ReviewLikedEvent, ReviewDeletedEvent } from '../notifications/events/notification.events';
+import {
+  ReviewCreatedEvent,
+  ReviewLikedEvent,
+  ReviewDeletedEvent,
+} from '../notifications/events/notification.events';
 import { ReviewVote } from './schemas/review-vote.schema';
 
 import { Product } from '../common/schemas/product.schema';
@@ -29,16 +37,16 @@ export class ReviewsService {
       productId: product._id,
     });
     const saved = await newReview.save();
-    
+
     // Emit event with product info for contextual notifications
     this.eventEmitter.emit(
       'review.created',
       new ReviewCreatedEvent(
-        saved._id as Types.ObjectId,
-        product._id as Types.ObjectId,
+        saved._id,
+        product._id,
         product.title,
         product.slug,
-        user._id as Types.ObjectId,
+        user._id,
         user.name,
         saved.rating,
       ),
@@ -57,13 +65,15 @@ export class ReviewsService {
       .sort({ createdAt: -1 })
       .lean()
       .exec();
-      
+
     return Promise.all(
       reviews.map(async (review: any) => {
-        const likesCount = await this.voteModel.countDocuments({ reviewId: review._id });
+        const likesCount = await this.voteModel.countDocuments({
+          reviewId: review._id,
+        });
         return { ...review, likes: likesCount };
-      })
-    ) as Promise<any[]>;
+      }),
+    );
   }
 
   async findById(id: string): Promise<Review> {
@@ -76,7 +86,7 @@ export class ReviewsService {
 
   async toggleLike(reviewId: string, user: User): Promise<{ liked: boolean }> {
     const review = await this.findById(reviewId);
-    
+
     const existing = await this.voteModel.findOne({
       reviewId: review._id,
       userId: user._id,
@@ -93,15 +103,15 @@ export class ReviewsService {
     });
 
     const product = await this.productModel.findById(review.productId);
-    
+
     // Emit event with product slug for linking
     this.eventEmitter.emit(
       'review.liked',
       new ReviewLikedEvent(
-        review._id as Types.ObjectId,
-        user._id as Types.ObjectId,
+        review._id,
+        user._id,
         user.name,
-        review.userId as Types.ObjectId,
+        review.userId,
         product?._id as Types.ObjectId,
         product?.slug,
       ),
@@ -124,11 +134,11 @@ export class ReviewsService {
     this.eventEmitter.emit(
       'review.deleted',
       new ReviewDeletedEvent(
-        review.userId as Types.ObjectId,
+        review.userId,
         product?._id as Types.ObjectId,
         product?.slug || '',
         user.name,
-      )
+      ),
     );
 
     return { message: 'Review deleted successfully' };

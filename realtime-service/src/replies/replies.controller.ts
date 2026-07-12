@@ -11,7 +11,10 @@ export class RepliesController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async create(@Body() createReplyDto: CreateReplyDto, @CurrentUser() user: User) {
+  async create(
+    @Body() createReplyDto: CreateReplyDto,
+    @CurrentUser() user: User,
+  ) {
     return this.repliesService.create(createReplyDto, user);
   }
 

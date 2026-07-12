@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/review.dto';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -11,7 +19,10 @@ export class ReviewsController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async create(@Body() createReviewDto: CreateReviewDto, @CurrentUser() user: User) {
+  async create(
+    @Body() createReviewDto: CreateReviewDto,
+    @CurrentUser() user: User,
+  ) {
     return this.reviewsService.create(createReviewDto, user);
   }
 
