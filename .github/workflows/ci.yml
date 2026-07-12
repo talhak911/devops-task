@@ -97,16 +97,22 @@ jobs:
         run: docker build -t frontend-image ./frontend
 
       # ─── DOCKER IMAGE VERIFICATION (SMOKE TESTS) ────────────────────────────
+      - name: Create Test Network
+        run: docker network create test-net
+
+      - name: Start MongoDB for Smoke Tests
+        run: docker run -d --name test_db --network test-net -p 27017:27017 mongo:6.0
+
       - name: Verify Backend Image
         run: |
-          docker run -d --name temp_backend -p 5005:5005 -e PORT=5005 -e NODE_ENV=production -e JWT_SECRET=mock_secret -e MONGODB_URI=mongodb://localhost:27017/mock backend-image
+          docker run -d --name temp_backend --network test-net -p 5005:5005 -e PORT=5005 -e NODE_ENV=production -e JWT_SECRET=mock_secret -e MONGODB_URI=mongodb://test_db:27017/mock backend-image
           sleep 5
           curl -f http://localhost:5005/api/health || (docker logs temp_backend && exit 1)
           docker stop temp_backend && docker rm temp_backend
 
       - name: Verify Realtime Service Image
         run: |
-          docker run -d --name temp_realtime -p 5006:5006 -e PORT=5006 -e NODE_ENV=production -e JWT_SECRET=mock_secret -e MONGODB_URI=mongodb://localhost:27017/mock realtime-image
+          docker run -d --name temp_realtime --network test-net -p 5006:5006 -e PORT=5006 -e NODE_ENV=production -e JWT_SECRET=mock_secret -e MONGODB_URI=mongodb://test_db:27017/mock realtime-image
           sleep 5
           curl -f http://localhost:5006/health || (docker logs temp_realtime && exit 1)
           docker stop temp_realtime && docker rm temp_realtime
@@ -117,3 +123,10 @@ jobs:
           sleep 5
           curl -f http://localhost:8080/health || (docker logs temp_frontend && exit 1)
           docker stop temp_frontend && docker rm temp_frontend
+
+      - name: Cleanup Test Infrastructure
+        if: always()
+        run: |
+          docker stop test_db || true
+          docker rm test_db || true
+          docker network rm test-net || true
