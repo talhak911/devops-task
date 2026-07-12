@@ -20,7 +20,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    const socketUrl = import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006';
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006';
     const token = localStorage.getItem('access_token');
     
     // Always connect, token is optional for guests to receive public broadcasts

@@ -63,7 +63,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     try {
       const currentPage = reset ? 1 : page;
       const response = await api.get(`/api/v1/notifications?page=${currentPage}&limit=10`, {
-        baseURL: import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006',
+        baseURL: import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006',
         headers: isAuthenticated ? {
             Authorization: `Bearer ${localStorage.getItem('access_token')}`
         } : {}
@@ -91,7 +91,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!isAuthenticated) return;
     try {
       const response = await api.get('/api/v1/notifications/unread-count', {
-        baseURL: import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006',
+        baseURL: import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006',
       });
       setDbUnreadCount(response.data.count);
     } catch (error) {
@@ -168,7 +168,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (isAuthenticated) {
       try {
         await api.patch(`/api/v1/notifications/${id}/read`, {}, {
-          baseURL: import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006',
+          baseURL: import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006',
         });
         setNotifications((prev) =>
           prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
@@ -196,7 +196,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (isAuthenticated) {
       try {
         await api.post('/api/v1/notifications/read-all', {}, {
-          baseURL: import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006',
+          baseURL: import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006',
         });
         setDbUnreadCount(0);
       } catch (error) {

@@ -8,9 +8,14 @@ import { User } from './common/schemas/user.schema';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+
   @Get('health')
   getHealth() {
-    return this.appService.getHealthStatus();
+    return { status: 'ok' };
   }
 
   @Get('auth/test')

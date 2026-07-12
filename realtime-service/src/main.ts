@@ -9,7 +9,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   // Set global API prefix
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1', { exclude: ['health'] });
 
   // Use global exception filters
   app.useGlobalFilters(new AllExceptionsFilter());

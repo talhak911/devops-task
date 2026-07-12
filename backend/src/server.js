@@ -18,6 +18,10 @@ connectDB();
 const app = express();
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.get("/health", (_req, res) => {
   res.status(200).json({
     success: true,
@@ -86,7 +90,7 @@ app.use((err, _req, res, _next) => {
 });
 
 // ─── Server Start ─────────────────────────────────────────────────────────────
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "production" || require.main === module) {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 Server running on port ${PORT}`);

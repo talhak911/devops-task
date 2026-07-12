@@ -50,7 +50,7 @@ const ReviewSection: React.FC<{ productId: string }> = ({ productId }) => {
   const [likes, setLikes] = useState<{ [reviewId: string]: boolean }>({});
   const { socket, isConnected } = useSocket();
 
-  const API_URL = import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006';
+  const API_URL = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_REALTIME_URL || 'http://localhost:5006';
 
   const fetchReviews = async () => {
     try {
