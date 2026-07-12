@@ -22,3 +22,5 @@ EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:80/health || exit 1
+
+CMD ["/bin/sh", "-c", "if [ -n \"$VITE_API_URL\" ]; then sed -i \"s|http://localhost:5005|$VITE_API_URL|g\" /usr/share/nginx/html/assets/*.js; fi && if [ -n \"$VITE_SOCKET_URL\" ]; then sed -i \"s|http://localhost:5006|$VITE_SOCKET_URL|g\" /usr/share/nginx/html/assets/*.js; elif [ -n \"$VITE_REALTIME_URL\" ]; then sed -i \"s|http://localhost:5006|$VITE_REALTIME_URL|g\" /usr/share/nginx/html/assets/*.js; fi && nginx -g 'daemon off;'"]
